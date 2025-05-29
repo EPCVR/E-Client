@@ -1,12 +1,12 @@
 ##How to Install
 --------------------------------------------------------------------------------------------------------------------
 #Method 1
--a: Download the installer
--b: Open It
+  -a: Download the installer
+  -b: Open It
 ---------------------------------------------------------------------------------------------------------------------
 #Method 2
--a: Download the .dll
--b: Go to your Gorilla Tag directory
--c: Go to /BepinEx/plugins
--d: Drag the .dll in
+  -a: Download the .dll
+  -b: Go to your Gorilla Tag directory
+  -c: Go to /BepinEx/plugins
+  -d: Drag the .dll in
 ---------------------------------------------------------------------------------------------------------------------
