@@ -7,7 +7,10 @@ namespace StupidTemplete.Mods
 {
     internal class Fun
     {
+
         public static float lastBangTime;
+
+
         public static void Vomit()
         {
             if (ControllerInputPoller.instance.rightGrab)
@@ -17,7 +20,7 @@ namespace StupidTemplete.Mods
 
                 var col = Color.green; // color of projectile
                 Vector3 pos = GorillaLocomotion.GTPlayer.Instance.headCollider.transform.position; // spawn position of projectile
-                Vector3 vel = GorillaLocomotion.GTPlayer.Instance.bodyCollider.transform.forward * 8.33f;
+                Vector3 vel = GorillaLocomotion.GTPlayer.Instance.bodyCollider.transform.forward * 999999999999999999999999f;
                 LaunchProjectile(proj, trail, pos, vel, col);
             }
         }

@@ -4,221 +4,74 @@ using System.Text;
 using GorillaLocomotion.Climbing;
 using GorillaTagScripts;
 using Photon.Pun;
+using Photon.Realtime;
 using StupidTemplate.Menu;
 using StupidTemplate.Notifications;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using System.Collections;
+// This clears the Object confusion
+using Object = UnityEngine.Object;
+using System.Reflection;
+
 
 namespace StupidTemplate.Mods
 {
     internal class Advantages
     {
+        // This is the gun color this and other varibles change depending on the edition
+        public static Color CurrentGunColor = Color.blue;
         public static int longarmCycle = 2;
         public static float armlength = 1.25f;
-
-
-        public static List<NetPlayer> InfectedList()
+        public static float GameMode = 2f;
+        public static bool ghostMonke = false;
+        public static bool rightHand = false;
+        public static bool lastHit;
+        public static bool lastHit2;
+        public static GameObject orb;
+        public static GameObject orb2;
+        public static void DrawHandOrbs()
         {
-            List<NetPlayer> infected = new List<NetPlayer> { };
-
-            if (!PhotonNetwork.InRoom)
-                return infected;
-
-            string gamemode = GorillaGameManager.instance.GameModeName().ToLower();
-
-            if (gamemode.Contains("infection") || gamemode.Contains("tag"))
-            {
-                GorillaTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Tag Manager").GetComponent<GorillaTagManager>();
-                if (tagman.isCurrentlyTag)
-                    infected.Add(tagman.currentIt);
-                else
-                {
-                    foreach (NetPlayer plr in tagman.currentInfected)
-                        infected.Add(plr);
-                }
-            }
-            else if (gamemode.Contains("ghost"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla GhostTag Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                    infected.Add(tagman.currentIt);
-                else
-                {
-                    foreach (NetPlayer plr in tagman.currentInfected)
-                        infected.Add(plr);
-                }
-            }
-            else if (gamemode.Contains("ambush") || gamemode.Contains("stealth"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Stealth Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                    infected.Add(tagman.currentIt);
-                else
-                {
-                    foreach (NetPlayer plr in tagman.currentInfected)
-                        infected.Add(plr);
-                }
-            }
-            else if (gamemode.Contains("freeze"))
-            {
-                GorillaFreezeTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Freeze Tag Manager").GetComponent<GorillaFreezeTagManager>();
-                if (tagman.isCurrentlyTag)
-                    infected.Add(tagman.currentIt);
-                else
-                {
-                    foreach (NetPlayer plr in tagman.currentInfected)
-                        infected.Add(plr);
-                }
-            }
-
-            return infected;
+            orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orb2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            GameObject.Destroy(orb.GetComponent<Rigidbody>());
+            GameObject.Destroy(orb.GetComponent<SphereCollider>());
+            GameObject.Destroy(orb2.GetComponent<Rigidbody>());
+            GameObject.Destroy(orb2.GetComponent<SphereCollider>());
+            orb.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            orb2.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            orb.transform.position = GorillaTagger.Instance.leftHandTransform.position;
+            orb2.transform.position = GorillaTagger.Instance.rightHandTransform.position;
+            orb.GetComponent<Renderer>().material.color = CurrentGunColor;
+            orb2.GetComponent<Renderer>().material.color = CurrentGunColor;
+            GameObject.Destroy(orb, Time.deltaTime);
+            GameObject.Destroy(orb2, Time.deltaTime);
         }
-
-        public static void AddInfected(NetPlayer plr)
+        public static void TagGun()
         {
-            string gamemode = GorillaGameManager.instance.GameModeName().ToLower();
-            if (gamemode.Contains("infection") || gamemode.Contains("tag"))
+            if (ControllerInputPoller.instance.rightGrab)
             {
-                GorillaTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Tag Manager").GetComponent<GorillaTagManager>();
-                if (tagman.isCurrentlyTag)
+                MakeGun(CurrentGunColor, new Vector3(0.15f, 0.15f, 0.15f), 0.025f, PrimitiveType.Sphere, GorillaLocomotion.GTPlayer.Instance.rightControllerTransform, true, delegate
                 {
-                    tagman.ChangeCurrentIt(plr);
-                }
-                else
-                {
-                    if (!tagman.currentInfected.Contains(plr))
+                    if (ControllerInputPoller.instance.rightControllerPrimaryButtonTouch)
                     {
-                        tagman.AddInfectedPlayer(plr);
+                        VRRig vrrig = raycastHit.collider.GetComponent<VRRig>();
+                        GorillaTagger.Instance.offlineVRRig.enabled = false;
+                        GorillaTagger.Instance.offlineVRRig.transform.position = vrrig.transform.position;
                     }
-                }
-            }
-            if (gamemode.Contains("ambush") || gamemode.Contains("stealth"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Stealth Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    tagman.ChangeCurrentIt(plr);
-                }
-                else
-                {
-                    if (!tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.AddInfectedPlayer(plr);
-                    }
-                }
-            }
-            if (gamemode.Contains("ghost"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla GhostTag Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    tagman.ChangeCurrentIt(plr);
-                }
-                else
-                {
-                    if (!tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.AddInfectedPlayer(plr);
-                    }
-                }
-            }
-            if (gamemode.Contains("freeze"))
-            {
-                GorillaFreezeTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Freeze Tag Manager").GetComponent<GorillaFreezeTagManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    tagman.ChangeCurrentIt(plr);
-                }
-                else
-                {
-                    if (!tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.AddInfectedPlayer(plr);
-                    }
-                }
+                }, delegate { });
             }
         }
-
-        public static void RemoveInfected(NetPlayer plr)
+        public static void TagAll()
         {
-            string gamemode = GorillaGameManager.instance.GameModeName().ToLower();
-            if (gamemode.Contains("infection") || gamemode.Contains("tag"))
+            GorillaTagger.Instance.offlineVRRig.enabled = false;
+            foreach (VRRig rig in GorillaParent.instance.vrrigs)
             {
-                GorillaTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Tag Manager").GetComponent<GorillaTagManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    if (tagman.currentIt == plr)
-                    {
-                        tagman.currentIt = null;
-                    }
-                }
-                else
-                {
-                    if (tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.currentInfected.Remove(plr);
-                    }
-                }
+                GorillaTagger.Instance.offlineVRRig.transform.position = rig.transform.position - new Vector3(0f, -3f, 0f);
+                GorillaTagger.Instance.myVRRig.transform.position = rig.transform.position - new Vector3(0f, -3f, 0f);
+                GorillaLocomotion.GTPlayer.Instance.rightControllerTransform.position = rig.transform.position;
             }
-            if (gamemode.Contains("ambush") || gamemode.Contains("stealth"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Stealth Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    if (tagman.currentIt == plr)
-                    {
-                        tagman.currentIt = null;
-                    }
-                }
-                else
-                {
-                    if (tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.currentInfected.Remove(plr);
-                    }
-                }
-            }
-            if (gamemode.Contains("ghost"))
-            {
-                GorillaAmbushManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla GhostTag Manager").GetComponent<GorillaAmbushManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    if (tagman.currentIt == plr)
-                    {
-                        tagman.currentIt = null;
-                    }
-                }
-                else
-                {
-                    if (tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.currentInfected.Remove(plr);
-                    }
-                }
-            }
-            if (gamemode.Contains("freeze"))
-            {
-                GorillaFreezeTagManager tagman = GameObject.Find("GT Systems/GameModeSystem/Gorilla Freeze Tag Manager").GetComponent<GorillaFreezeTagManager>();
-                if (tagman.isCurrentlyTag)
-                {
-                    if (tagman.currentIt == plr)
-                    {
-                        tagman.currentIt = null;
-                    }
-                }
-                else
-                {
-                    if (tagman.currentInfected.Contains(plr))
-                    {
-                        tagman.currentInfected.Remove(plr);
-                    }
-                }
-            }
-        }
-        public static bool PlayerIsTagged(VRRig who)
-        {
-            string name = who.mainSkin.material.name.ToLower();
-            return name.Contains("fected") || name.Contains("it") || name.Contains("stealth") || name.Contains("ice") || !who.nameTagAnchor.activeSelf;
-            //return PlayerIsTagged(GorillaTagger.Instance.offlineVRRig);
+            GorillaTagger.Instance.offlineVRRig.enabled = true;
         }
 
 
@@ -296,8 +149,61 @@ namespace StupidTemplate.Mods
             UnityEngine.Object.Destroy(rvT.GetComponent<Rigidbody>());
             rvT.GetComponent<Renderer>().enabled = false;
             rvT.AddComponent<GorillaVelocityTracker>();
-        }
 
-        
+
+        }
+        public static GameObject pointer = null;
+        public static LineRenderer Line;
+        public static RaycastHit raycastHit;
+        public static bool hand = false;
+        public static bool hand1 = false;
+        public static void MakeGun(Color color, Vector3 pointersize, float linesize, PrimitiveType pointershape, Transform arm, bool liner, Action shit, Action shit1)
+        {
+            if (ControllerInputPoller.instance.rightGrab)
+            {
+                Physics.Raycast(arm.position, -arm.up, out raycastHit);
+                if (pointer == null) { pointer = GameObject.CreatePrimitive(pointershape); }
+                pointer.transform.localScale = pointersize;
+                pointer.GetComponent<Renderer>().material.shader = Shader.Find("GUI/Text Shader");
+                pointer.transform.position = raycastHit.point;
+                pointer.GetComponent<Renderer>().material.color = color;
+                if (liner)
+                {
+                    GameObject g = new GameObject("Line");
+                    Line = g.AddComponent<LineRenderer>();
+                    Line.material.shader = Shader.Find("GUI/Text Shader");
+                    Line.startWidth = linesize;
+                    Line.endWidth = linesize;
+                    Line.startColor = color;
+                    Line.endColor = color;
+                    Line.positionCount = 2;
+                    Line.useWorldSpace = true;
+                    Line.SetPosition(0, arm.position);
+                    Line.SetPosition(1, pointer.transform.position);
+                    Object.Destroy(g, Time.deltaTime);
+                }
+                Object.Destroy(pointer.GetComponent<BoxCollider>());
+                Object.Destroy(pointer.GetComponent<Rigidbody>());
+                Object.Destroy(pointer.GetComponent<Collider>());
+                if (hand1)
+                {
+                    shit.Invoke();
+                }
+                else
+                {
+                    shit1.Invoke();
+                }
+            }
+            else
+            {
+                if (pointer != null)
+                {
+                    Object.Destroy(pointer, Time.deltaTime);
+                }
+            }
+        }
     }
+
+
+
 }

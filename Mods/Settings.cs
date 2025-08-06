@@ -45,6 +45,11 @@ namespace StupidTemplate.Mods
             buttonsType = 8;
         }
 
+        public static void EnableVisuals()
+        {
+            buttonsType = 9;
+        }
+
         public static void ReturnToMain()
         {
             buttonsType = 0;

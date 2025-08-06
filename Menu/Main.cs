@@ -22,6 +22,7 @@ namespace StupidTemplate.Menu
             // Initialize Menu
                 try
                 {
+                    
                     bool toOpen = (!rightHanded && ControllerInputPoller.instance.leftControllerSecondaryButton) || (rightHanded && ControllerInputPoller.instance.rightControllerSecondaryButton);
                     bool keyboardOpen = UnityInput.Current.GetKey(keyboardButton);
 
