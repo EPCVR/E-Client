@@ -1,31 +1,16 @@
-# E-Client
-E-Client is a mod menu for the popular VR game Gorilla Tag. This menu is constantly being update so enjoy
+# ii's Stupid Template
+ii's Stupid Template is a mod menu template for Gorilla Tag with custom categories and the maximum amount of customization possible. This template is meant for more advanced users, so if you're a new menu creator, this could be difficult for you.
+
+## Do I need permission to use this?
+No, this template is free and public for anyone to use. You are welcome to utilize it for your projects, modify it to suit your needs, and share it with others. We believe in a collaborative and open community where resources are accessible to all.
 
 ---
 
 # Installation
 
-## Method 1.
-
-1. Download the file
-2. put the menu in .../Gorilla Tag/BepInEx/plugins
-3. Enjoy the menu
-
-## Method 2.
-
-1. Download the installer
-2. Enjoy the menu
-
----
-
-# DISCLAIMER
-
-I AM NOT RESPONSIBLE FOR ANY BANS OR ANY CONSERQUENCES.
-
-
-
-
-
-
-
-This product is not affiliated with Gorilla Tag or Another Axiom LLC and is not endorsed or otherwise sponsored by Another Axiom LLC. Portions of the materials contained herein are property of Another Axiom LLC. ©2021 Another Axiom LLC.
+- Download the source code from [here](https://github.com/iiDk-the-actual/iis.Stupid.Template/releases/latest)
+- Change your `<GamePath>` (Gorilla Tag directory) in `Directory.Build.props` if required
+- Change the menu name in `PluginInfo.cs`
+- Edit the menu visuals in `Menu/Settings.cs`
+- Add buttons in `Menu/Buttons.cs`
+- Build with `Ctrl` + `Shift` + `B`, it will get put in your plugins folder automatically
